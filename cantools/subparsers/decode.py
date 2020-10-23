@@ -7,11 +7,10 @@ from argparse_addons import Integer
 from .. import database
 from .utils import format_message_by_frame_id
 
-
 # Matches 'candump' output, i.e. "vcan0  1F0   [8]  00 00 00 00 00 00 1B C1".
-RE_CANDUMP = re.compile(r'^\s*\S+\s+([0-9A-F]+)\s*\[\d+\]\s*([0-9A-F ]*)$')
+RE_CANDUMP = re.compile(r'^\s*(?:\(\d+\.\d+\))?\s*\S+\s+([0-9A-F]+)\s*\[(\d+)\]\s*([0-9A-F ]*)$')
 # Matches 'candump -l' (or -L) output, i.e. "(1594172461.968006) vcan0 1F0#0000000000001BC1"
-RE_CANDUMP_LOG = re.compile(r'^\(\d+\.\d+\)\s+\S+\s+([\dA-F]+)#([\dA-F]*)$')
+RE_CANDUMP_LOG = re.compile(r'^\(\d+\.\d+\)\s+\S+\s+([\dA-F]+)(#{1,2})([\dA-F]*)$')
 
 
 def _mo_unpack(mo):
@@ -19,8 +18,10 @@ def _mo_unpack(mo):
     frame_id = '0' * (8 - len(frame_id)) + frame_id
     frame_id = binascii.unhexlify(frame_id)
     frame_id = struct.unpack('>I', frame_id)[0]
-    data = mo.group(2)
+    data = mo.group(3)
     data = data.replace(' ', '')
+    if mo.group(2) == '##':
+        data = data[1:]
     data = binascii.unhexlify(data)
 
     return frame_id, data

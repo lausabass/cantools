@@ -43,6 +43,11 @@ class Parser60(textparser.Parser):
         'Enum',
         'Sig',
         'ID',
+        'Type',
+        'Standard',
+        'Extended',
+        'FDStandard',
+        'FDExtended',
         'Len',
         'Mux',
         'CycleTime',
@@ -156,7 +161,7 @@ class Parser60(textparser.Parser):
         enum = Sequence('Enum', '=', word,
                         '(', Optional(DelimitedList(enum_value)), ')',
                         Optional('COMMENT'))
-
+        frame_type = choice('Standard', 'Extended', 'FDStandard', 'FDExtended')
         sig_unit = '/u:'
         sig_factor = Sequence('/f:', 'NUMBER')
         sig_offset = Sequence('/o:', 'NUMBER')
@@ -184,7 +189,7 @@ class Parser60(textparser.Parser):
 
         variable = Sequence('Var', '=', Any(), word,
                             'NUMBER', ',', 'NUMBER',
-                            ZeroOrMore(choice('-v', '-m', '-s')),
+                            ZeroOrMore(choice('-v', '-m', '-s', '-h')),
                             ZeroOrMore(choice(sig_unit,
                                               sig_factor,
                                               sig_offset,
@@ -201,6 +206,7 @@ class Parser60(textparser.Parser):
                               Sequence('ID', '=', 'NUMBER', word,
                                        Optional(Sequence('NUMBER', word)),
                                        Optional('COMMENT')),
+                              Sequence('Type', '=', frame_type),
                               Sequence('Len', '=', 'NUMBER'),
                               Sequence('Mux', '=', Any(), 'NUMBER', ',',
                                        'NUMBER', 'NUMBER',
@@ -586,9 +592,18 @@ def _load_message(frame_id,
     #print(message_tokens)
     # Default values.
     name = message_tokens[1]
-    length = 8
+    length = None
     cycle_time = None
     comment = None
+    is_fd_can = False
+
+    if 'Type' in message_tokens[3]:
+        type_value = message_tokens[3]['Type'][0][2]
+        if type_value.startswith('FD'):
+            is_fd_can = True
+            type_value = type_value[2:]
+        if type_value == 'Extended':
+            is_extended_frame = True
 
     if 'Len' in message_tokens[3]:
         length = int(message_tokens[3]['Len'][0][2])
@@ -616,7 +631,8 @@ def _load_message(frame_id,
                                                  enums),
                    comment=comment,
                    bus_name=None,
-                   strict=strict)
+                   strict=strict,
+                   is_fd_can=is_fd_can)
 
 
 def _parse_message_frame_ids(message):

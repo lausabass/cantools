@@ -36,7 +36,8 @@ class Message(object):
                  bus_name=None,
                  signal_groups=None,
                  strict=True,
-                 protocol=None):
+                 protocol=None,
+                 is_fd_can=False):
         frame_id_bit_length = frame_id.bit_length()
 
         if is_extended_frame:
@@ -52,6 +53,8 @@ class Message(object):
         self._frame_id = frame_id
         self._is_extended_frame = is_extended_frame
         self._name = name
+        if length is None:
+            length = 64 if is_fd_can else 8
         self._length = length
         self._signals = signals
         self._signals.sort(key=start_bit)

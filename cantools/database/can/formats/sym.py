@@ -277,6 +277,7 @@ def _load_signal_type_and_length(type_, tokens, enums):
     # Default values.
     is_signed = False
     is_float = False
+    is_raw = False
     length = 0
     enum = None
     minimum = None
@@ -305,14 +306,14 @@ def _load_signal_type_and_length(type_, tokens, enums):
         # As unsigned integer for now.
         length = 8
     elif type_ in ['string', 'raw']:
-        # As unsigned integer for now.
+        is_raw = True
         length = int(tokens[0])
     else:
         # Enum. As unsigned integer for now.
         length = int(tokens[0])
         enum = _get_enum(enums, type_)
 
-    return is_signed, is_float, length, enum, minimum, maximum, decimal
+    return is_signed, is_float, is_raw, length, enum, minimum, maximum, decimal
 
 
 def _load_signal_attributes(tokens, enum, enums, minimum, maximum, decimal):
@@ -362,6 +363,7 @@ def _load_signal(tokens, enums):
     # Type and length.
     (is_signed,
      is_float,
+     is_raw,
      length,
      enum,
      minimum,
@@ -402,6 +404,7 @@ def _load_signal(tokens, enums):
                   comment=comment,
                   is_multiplexer=False,
                   is_float=is_float,
+                  is_raw=is_raw,
                   decimal=decimal)
 
 
@@ -459,6 +462,7 @@ def _load_message_variable(tokens,
     # Type and length.
     (is_signed,
      is_float,
+     is_raw,
      length,
      enum,
      minimum,
@@ -504,6 +508,7 @@ def _load_message_variable(tokens,
                   multiplexer_ids=multiplexer_ids,
                   multiplexer_signal=multiplexer_signal,
                   is_float=is_float,
+                  is_raw=is_raw,
                   decimal=decimal)
 
 

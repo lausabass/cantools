@@ -124,6 +124,7 @@ class Signal(object):
                  multiplexer_ids=None,
                  multiplexer_signal=None,
                  is_float=False,
+                 is_raw=False,
                  decimal=None,
                  spn=None):
         self._name = name
@@ -146,6 +147,7 @@ class Signal(object):
         self._multiplexer_ids = multiplexer_ids
         self._multiplexer_signal = multiplexer_signal
         self._is_float = is_float
+        self._is_raw = is_raw
         self._spn = spn
 
     @property
@@ -221,6 +223,26 @@ class Signal(object):
     @is_float.setter
     def is_float(self, value):
         self._is_float = value
+
+    @property
+    def is_raw(self):
+        """``True`` if the signal is raw, ``False`` otherwise.
+
+        """
+
+        return self._is_raw
+
+    @is_raw.setter
+    def is_raw(self, value):
+        self._is_raw = value
+
+    @property
+    def initial(self):
+        """The initial value of the signal, or ``None`` if unavailable.
+
+        """
+
+        return self._initial
 
     @property
     def initial(self):

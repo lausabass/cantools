@@ -4,6 +4,7 @@ MULTI_LINE_FMT = '''
 )\
 '''
 
+import binascii
 
 def _format_signals(message, decoded_signals):
     formatted_signals = []
@@ -16,6 +17,9 @@ def _format_signals(message, decoded_signals):
 
         if isinstance(value, str):
             value = "'{}'".format(value)
+
+        if isinstance(value, bytes):
+            value = binascii.hexlify(value).decode()
 
         signal_name = signal.name
 

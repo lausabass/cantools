@@ -68,6 +68,9 @@ def _decode_field(field, value, decode_choices, scaling):
         except (KeyError, TypeError):
             pass
 
+    if isinstance(value, bytes):
+        return value;
+
     if scaling:
         return (field.scale * value + field.offset)
     else:
@@ -111,6 +114,8 @@ def create_encode_decode_formats(datas, number_of_bytes):
             return 'f'
         elif data.is_signed:
             return 's'
+        elif data.is_raw:
+            return 'r'
         else:
             return 'u'
 

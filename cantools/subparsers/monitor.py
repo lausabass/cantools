@@ -10,7 +10,6 @@ from .. import database
 from .utils import format_message
 from .utils import format_multiplexed_name
 
-
 class QuitError(Exception):
     pass
 
@@ -49,8 +48,11 @@ class Monitor(can.Listener):
         self._notifier = can.Notifier(bus, [self])
 
     def create_bus(self, args):
-        kwargs = {}
+        kwargs = {'fd':True}
 
+        if args.no_can_fd:
+            kwargs['fd'] = False
+            
         if args.bit_rate is not None:
             kwargs['bitrate'] = int(args.bit_rate)
 
@@ -351,6 +353,10 @@ def add_subparser(subparsers):
     monitor_parser.add_argument(
         '-B', '--bit-rate',
         help='Python CAN bus bit rate.')
+    monitor_parser.add_argument(
+        '--no-can-fd',
+        action='store_true',
+        help='disable CAN FD support')
     monitor_parser.add_argument(
         'database',
         help='Database file.')

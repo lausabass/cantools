@@ -1349,7 +1349,7 @@ class CanToolsDatabaseTest(unittest.TestCase):
         db = cantools.db.Database()
         db.add_sym_file('tests/files/sym/jopp-6.0.sym')
 
-        self.assertEqual(len(db.messages), 6)
+        self.assertEqual(len(db.messages), 7)
         self.assertEqual(len(db.messages[0].signals), 0)
 
         # Message1.
@@ -1498,6 +1498,28 @@ class CanToolsDatabaseTest(unittest.TestCase):
         self.assertEqual(signal_3.length, 11)
         self.assertEqual(signal_3.is_multiplexer, False)
         self.assertEqual(signal_3.multiplexer_ids, [2])
+
+        signal_6 = db.messages[6].signals[0]
+        self.assertEqual(signal_6.name, 'Signal6')
+        self.assertEqual(signal_6.start, 0)
+        self.assertEqual(signal_6.length, 64)
+        self.assertEqual(signal_6.receivers, [])
+        self.assertEqual(signal_6.byte_order, 'little_endian')
+        self.assertEqual(signal_6.is_signed, False)
+        self.assertEqual(signal_6.is_float, True)
+        self.assertEqual(signal_6.scale, -1E-005)
+        self.assertEqual(signal_6.offset, 2E-2)
+        self.assertEqual(signal_6.minimum, -2.5E-10)
+        self.assertEqual(signal_6.maximum, 1.5E-000)
+        self.assertEqual(signal_6.decimal.scale, Decimal('-1E-005'))
+        self.assertEqual(signal_6.decimal.offset, Decimal('2E-2'))
+        self.assertEqual(signal_6.decimal.minimum, Decimal('-2.5E-10'))
+        self.assertEqual(signal_6.decimal.maximum, Decimal('1.5E-000'))
+        self.assertEqual(signal_6.unit, None)
+        self.assertEqual(signal_6.choices, None)
+        self.assertEqual(signal_6.comment, None)
+        self.assertEqual(signal_6.is_multiplexer, False)
+        self.assertEqual(signal_6.multiplexer_ids, None)
 
         # Encode and decode.
         frame_id = 0x009

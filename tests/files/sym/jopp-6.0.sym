@@ -12,6 +12,7 @@ Sig=Signal2 float /u:V /o:48 /min:16 /max:130 /ln:"hhh"	// bbb
 Sig=Signal3 signed 11 -m /min:0 /max:1 /e:Foo
 Sig=Signal4 double /u:*UU /f:6 /o:5 /min:-1.7E308 /max:1.7E308
 Sig=Signal5 char
+Sig=Signal6 double /f:-1E-005 /o:2E-2 /min:-2.5E-10 /max:1.5E-000
 
 {SEND}
 
@@ -57,3 +58,9 @@ Sig=Signal2 6
 Len=8
 Mux=Multiplexer3 0,3 2
 Sig=Signal3 9
+
+[Message3]
+ID=001h
+Len=8
+Sig=Signal6 0
+

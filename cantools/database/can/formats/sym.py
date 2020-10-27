@@ -126,6 +126,7 @@ class Parser60(textparser.Parser):
 
         tokens, token_regex = tokenize_init(token_specs)
 
+        last_kind = ''
         for mo in re.finditer(token_regex, string, re.DOTALL):
             kind = mo.lastgroup
 
@@ -143,9 +144,15 @@ class Parser60(textparser.Parser):
                 if kind in names:
                     kind = names[kind]
 
-                tokens.append(Token(kind, value, mo.start()))
+                if kind == 'NUMBER' and last_kind == 'NUMBER':
+                    last_token = tokens.pop()
+                    tokens.append(Token(kind, last_token.value + value, last_token.offset))
+                else:
+                    tokens.append(Token(kind, value, mo.start()))
             else:
                 raise TokenizeError(string, mo.start())
+
+            last_kind = kind
 
         return tokens
 

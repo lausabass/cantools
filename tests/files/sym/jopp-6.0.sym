@@ -59,6 +59,22 @@ Len=8
 Mux=Multiplexer3 0,3 2
 Sig=Signal3 9
 
+[Symbol4]
+ID=034h
+Len=8
+Mux=Multiplexer1 0,16 000h
+Sig=Signal1 16
+
+[Symbol4]
+Len=8
+Mux=Multiplexer2 0,16 00Ah
+Sig=Signal2 16
+
+[Symbol4]
+Len=8
+Mux=Multiplexer3 0,16 -1h
+Sig=Signal3 16
+
 [Message3]
 ID=001h
 Len=8

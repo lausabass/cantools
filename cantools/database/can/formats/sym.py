@@ -144,9 +144,9 @@ class Parser60(textparser.Parser):
                 if kind in names:
                     kind = names[kind]
 
-                if kind == 'NUMBER' and last_kind == 'NUMBER':
+                if last_kind == 'NUMBER' and (kind == 'NUMBER' or (kind == 'WORD' and value == 'h')):
                     last_token = tokens.pop()
-                    tokens.append(Token(kind, last_token.value + value, last_token.offset))
+                    tokens.append(Token(last_kind, last_token.value + value, last_token.offset))
                 else:
                     tokens.append(Token(kind, value, mo.start()))
             else:
@@ -210,8 +210,8 @@ class Parser60(textparser.Parser):
 
         symbol = Sequence('[', Any(), ']',
                           ZeroOrMoreDict(choice(
-                              Sequence('ID', '=', 'NUMBER', word,
-                                       Optional(Sequence('NUMBER', word)),
+                              Sequence('ID', '=', 'NUMBER',
+                                       Optional('NUMBER'),
                                        Optional('COMMENT')),
                               Sequence('Type', '=', frame_type),
                               Sequence('Len', '=', 'NUMBER'),
@@ -221,7 +221,7 @@ class Parser60(textparser.Parser):
                               Sequence('CycleTime', '=', 'NUMBER'),
                               Sequence('Timeout', '=', 'NUMBER'),
                               Sequence('MinInterval', '=', 'NUMBER'),
-                              Sequence('Color', '=', 'NUMBER', 'WORD'),
+                              Sequence('Color', '=', 'NUMBER'),
                               variable,
                               Sequence('Sig', '=', Any(), 'NUMBER'))))
 
@@ -247,6 +247,12 @@ class Parser60(textparser.Parser):
 
         return grammar
 
+
+def _to_int(string):
+    if string[-1:] == 'h':
+        return int(string[:-1], 16)
+    else:
+        return int(string)
 
 def _get_section_tokens(tokens, name):
     for section in tokens[3]:
@@ -555,7 +561,7 @@ def _load_muxed_message_signals(message_tokens,
         )
     ]
 
-    multiplexer_ids = [int(mux_tokens[6])]
+    multiplexer_ids = [_to_int(mux_tokens[6])]
     result += _load_message_signals_inner(message_tokens,
                                           signals,
                                           enums,
@@ -565,7 +571,7 @@ def _load_muxed_message_signals(message_tokens,
     for tokens in message_section_tokens:
         if tokens[1] == message_tokens[1] and tokens != message_tokens:
             mux_tokens = tokens[3]['Mux'][0]
-            multiplexer_ids = [int(mux_tokens[6])]
+            multiplexer_ids = [_to_int(mux_tokens[6])]
             result += _load_message_signals_inner(tokens,
                                                   signals,
                                                   enums,
@@ -648,17 +654,17 @@ def _load_message(frame_id,
 
 
 def _parse_message_frame_ids(message):
-    def to_int(string):
-        return int(string, 16)
-
     def is_extended_frame(string):
-        return len(string) == 8
+        if string[-1:] == 'h':
+            return len(string) == 9
+        else:
+            return len(string) == 8
 
     message = message[3]['ID'][0]
-    minimum = to_int(message[2])
+    minimum = _to_int(message[2])
 
-    if message[4]:
-        maximum = -to_int(message[4][0][0])
+    if message[3]:
+        maximum = -_to_int(message[3][0])
     else:
         maximum = minimum
 

@@ -1349,7 +1349,7 @@ class CanToolsDatabaseTest(unittest.TestCase):
         db = cantools.db.Database()
         db.add_sym_file('tests/files/sym/jopp-6.0.sym')
 
-        self.assertEqual(len(db.messages), 7)
+        self.assertEqual(len(db.messages), 8)
         self.assertEqual(len(db.messages[0].signals), 0)
 
         # Message1.
@@ -1499,7 +1499,38 @@ class CanToolsDatabaseTest(unittest.TestCase):
         self.assertEqual(signal_3.is_multiplexer, False)
         self.assertEqual(signal_3.multiplexer_ids, [2])
 
-        signal_6 = db.messages[6].signals[0]
+        # Symbol4.
+        symbol_4 = db.messages[6]
+        self.assertEqual(symbol_4.frame_id, 0x34)
+        self.assertEqual(symbol_4.length, 8)
+        self.assertEqual(symbol_4.is_multiplexed(), True)
+        self.assertEqual(len(symbol_4.signals), 4)
+        multiplexer = symbol_4.signals[0]
+        self.assertEqual(multiplexer.name, 'Multiplexer1')
+        self.assertEqual(multiplexer.start, 0)
+        self.assertEqual(multiplexer.length, 16)
+        self.assertEqual(multiplexer.is_multiplexer, True)
+        self.assertEqual(multiplexer.multiplexer_ids, None)
+        signal_1 = symbol_4.signals[1]
+        self.assertEqual(signal_1.name, 'Signal1')
+        self.assertEqual(signal_1.start, 16)
+        self.assertEqual(signal_1.length, 11)
+        self.assertEqual(signal_1.is_multiplexer, False)
+        self.assertEqual(signal_1.multiplexer_ids, [0])
+        signal_2 = symbol_4.signals[2]
+        self.assertEqual(signal_2.name, 'Signal2')
+        self.assertEqual(signal_2.start, 16)
+        self.assertEqual(signal_2.length, 32)
+        self.assertEqual(signal_2.is_multiplexer, False)
+        self.assertEqual(signal_2.multiplexer_ids, [10])
+        signal_3 = symbol_4.signals[3]
+        self.assertEqual(signal_3.name, 'Signal3')
+        self.assertEqual(signal_3.start, 23)
+        self.assertEqual(signal_3.length, 11)
+        self.assertEqual(signal_3.is_multiplexer, False)
+        self.assertEqual(signal_3.multiplexer_ids, [-1])
+
+        signal_6 = db.messages[7].signals[0]
         self.assertEqual(signal_6.name, 'Signal6')
         self.assertEqual(signal_6.start, 0)
         self.assertEqual(signal_6.length, 64)

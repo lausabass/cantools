@@ -1502,7 +1502,7 @@ class CanToolsDatabaseTest(unittest.TestCase):
         # Symbol4.
         symbol_4 = db.messages[6]
         self.assertEqual(symbol_4.frame_id, 0x34)
-        self.assertEqual(symbol_4.length, 8)
+        self.assertEqual(symbol_4.length, 12)
         self.assertEqual(symbol_4.is_multiplexed(), True)
         self.assertEqual(len(symbol_4.signals), 4)
         multiplexer = symbol_4.signals[0]

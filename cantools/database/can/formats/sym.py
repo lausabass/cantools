@@ -25,7 +25,6 @@ from ..internal_database import InternalDatabase
 from .utils import num
 from ...errors import ParseError
 
-
 LOGGER = logging.getLogger(__name__)
 
 
@@ -567,9 +566,12 @@ def _load_muxed_message_signals(message_tokens,
                                           enums,
                                           multiplexer_signal,
                                           multiplexer_ids)
-
+    max_length = 0
     for tokens in message_section_tokens:
         if tokens[1] == message_tokens[1] and tokens != message_tokens:
+            length = int(tokens[3]['Len'][0][2])
+            if length > max_length:
+                max_length = length;
             mux_tokens = tokens[3]['Mux'][0]
             multiplexer_ids = [_to_int(mux_tokens[6])]
             result += _load_message_signals_inner(tokens,
@@ -578,7 +580,7 @@ def _load_muxed_message_signals(message_tokens,
                                                   multiplexer_signal,
                                                   multiplexer_ids)
 
-    return result
+    return result, max_length
 
 
 def _is_multiplexed(message_tokens):
@@ -597,7 +599,7 @@ def _load_message_signals(message_tokens,
     else:
         return _load_message_signals_inner(message_tokens,
                                            signals,
-                                           enums)
+                                           enums), 0
 
 
 def _load_message(frame_id,
@@ -636,6 +638,14 @@ def _load_message(frame_id,
     if message_tokens[3]['ID'][0][-1]:
         comment = _load_comment(message_tokens[3]['ID'][0][-1][0])
 
+    signals,max_length = _load_message_signals(message_tokens,
+                                               message_section_tokens,
+                                               signals,
+                                               enums)
+
+    if length and max_length > length:
+        length = max_length
+
     return Message(frame_id=frame_id,
                    is_extended_frame=is_extended_frame,
                    name=name,
@@ -643,10 +653,7 @@ def _load_message(frame_id,
                    senders=[],
                    send_type=None,
                    cycle_time=cycle_time,
-                   signals=_load_message_signals(message_tokens,
-                                                 message_section_tokens,
-                                                 signals,
-                                                 enums),
+                   signals=signals,
                    comment=comment,
                    bus_name=None,
                    strict=strict,

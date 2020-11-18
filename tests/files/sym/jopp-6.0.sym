@@ -71,7 +71,7 @@ Mux=Multiplexer2 0,16 00Ah
 Sig=Signal2 16
 
 [Symbol4]
-Len=8
+Len=12
 Mux=Multiplexer3 0,16 -1h
 Sig=Signal3 16
 

@@ -3,6 +3,7 @@ import time
 import curses
 import bisect
 import queue
+import json
 
 import can
 from argparse_addons import Integer
@@ -56,10 +57,16 @@ class Monitor(can.Listener):
         if args.bit_rate is not None:
             kwargs['bitrate'] = int(args.bit_rate)
 
+        bittiming = {}
+        if args.bittiming is not None:
+            with open(args.bittiming) as bittiming_file:
+                bittiming = json.load(bittiming_file)
+
         try:
             return can.Bus(bustype=args.bus_type,
                            channel=args.channel,
-                           **kwargs)
+                           **kwargs,
+						   **bittiming)
         except:
             raise Exception(
                 "Failed to create CAN bus with bustype='{}' and "
@@ -357,6 +364,9 @@ def add_subparser(subparsers):
         '--no-can-fd',
         action='store_true',
         help='disable CAN FD support')
+    monitor_parser.add_argument(
+        '-t', '--bittiming',
+        help='Read bittiming from json file.')
     monitor_parser.add_argument(
         'database',
         help='Database file.')

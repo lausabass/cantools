@@ -50,6 +50,9 @@ def _encode_field(field, data, scaling):
 
     if isinstance(value, str):
         return field.choice_string_to_number(value)
+    elif isinstance(value, bytes):
+        #field.is_raw == True
+        return value;
     elif scaling:
         if field.is_float:
             return (value - field.offset) / field.scale
@@ -70,8 +73,7 @@ def _decode_field(field, value, decode_choices, scaling):
 
     if isinstance(value, bytes):
         return value;
-
-    if scaling:
+    elif scaling:
         return (field.scale * value + field.offset)
     else:
         return value
